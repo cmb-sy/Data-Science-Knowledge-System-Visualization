@@ -1,7 +1,3 @@
-"""
-指数分布の実装
-"""
-
 import numpy as np
 from scipy import stats
 
@@ -15,24 +11,22 @@ from .base import (
 
 
 class ExponentialDistribution:
-    """指数分布の実装"""
 
     @staticmethod
     def get_info() -> DistributionInfo:
-        """指数分布の情報を取得"""
         return DistributionInfo(
             type=DistributionType.EXPONENTIAL,
             name="指数分布",
             description="待ち時間や寿命を表す連続確率分布。ある事象が発生するまでの時間をモデル化します。",
             category=CategoryType.CONTINUOUS,
-            tags=["基本", "連続", "指数", "待ち時間"],
+            tags=["連続型確率分布"],
             formula_pdf=r"f(x) = \begin{cases} \lambda e^{-\lambda x} & \text{if } x \geq 0 \\ 0 & \text{otherwise} \end{cases}",
             formula_cdf=r"F(x) = \begin{cases} 0 & \text{if } x < 0 \\ 1 - e^{-\lambda x} & \text{if } x \geq 0 \end{cases}",
             parameters=[
                 DistributionParameter(
                     name="lambda_",
-                    label="レート (λ)",
-                    description="単位時間あたりの事象発生率。大きいほど事象が頻繁に発生します。",
+                    label="λ",
+                    description="単位時間あたりの事象発生率。大きいほど事象が頻繁に発生する。",
                     default_value=1.0,
                     min_value=0.1,
                     max_value=10.0,
@@ -54,24 +48,22 @@ class ExponentialDistribution:
             DistributionData: グラフ描画用のデータ
         """
         if lambda_ <= 0:
-            raise ValueError("レート (λ) は正の値でなければなりません")
+            raise ValueError("λは正の値でなければなりません")
 
-        # scipy.statsを使用して指数分布を生成
-        dist = stats.expon(scale=1 / lambda_)
+        # 統計量を計算（理論値）
+        mean = 1.0 / lambda_
+        variance = 1.0 / (lambda_**2)
+        std_dev = 1.0 / lambda_
 
         # x軸の値を生成（平均の5倍程度まで表示）
-        mean_val = 1 / lambda_
-        x_max = mean_val * 5
+        x_max = mean * 5
         x = np.linspace(0, x_max, num_points)
 
-        # PDFとCDFを計算
-        pdf = dist.pdf(x)
-        cdf = dist.cdf(x)
+        # PDF を数式から直接計算: f(x) = λ * e^(-λx) for x >= 0
+        pdf = lambda_ * np.exp(-lambda_ * x)
 
-        # 統計量を計算
-        mean = dist.mean()
-        variance = dist.var()
-        std_dev = dist.std()
+        # CDF を数式から直接計算: F(x) = 1 - e^(-λx) for x >= 0
+        cdf = 1 - np.exp(-lambda_ * x)
 
         return DistributionData(
             x_values=x.tolist(),
