@@ -1,0 +1,86 @@
+---
+description: UIパッケージ ガイドライン
+globs: packages/ui/**
+alwaysApply: false
+---
+
+<!-- # UI パッケージ ガイドライン（overview） -->
+
+<!-- このドキュメントは、 `packages/ui` ディレクトリ配下の UI コンポーネント開発に関する基本方針・推奨事項をまとめたものです。 -->
+
+## 目的
+
+- サービス間で再利用可能な UI コンポーネント群の設計・実装指針を提供します。
+- 一貫性のある UI/UX と保守性の高いコードベースを実現します。
+
+## 基本方針
+
+- **TypeScript**による型安全な実装を徹底してください。
+- **命名規則・ファイル構成**はプロジェクト全体のコーディングガイドラインに準拠してください。
+- エントリーポイントとして各コンポーネントディレクトリに `index.ts` を配置し、エクスポートを一本化してください。
+- 複雑なコンポーネントは機能単位でファイルを分割し、責務を明確にしてください。
+- **関数宣言（function）によるコンポーネント定義**を行ってください。
+
+  - `const` によるアロー関数式ではなく、 `function` キーワードを用いた宣言的な記述を行ってください。
+  - 例：
+
+    ```tsx
+    export function Button(props: ButtonProps) {
+      // ...
+    }
+    ```
+
+- **React19 以降**を前提とした構文で実装してください
+  - 関数コンポーネントでは `ref` を通常の prop として受け取り、`forwardRef` は使用しない
+  - 型は HTML プリミティブ由来からの Pick を最優先としてください
+- **ARIA 属性を正しく付与**してください
+- **Props の型定義**は `interface` を用いて明示的に記述してください
+
+  - 例外として、次の場合のみ `type` を許容します
+    - ESLint の`no-empty-object-type`回避のため、HTML プリミティブ由来の`Pick`の別名を定義するケース
+  - 命名は公開コンポーネントで `XXXProps` に統一（例：`ButtonProps`）
+  - `type` を用いるのは Pick の別名定義に限定する
+  - 例：
+
+    ```ts
+    export interface ButtonProps {
+      ref?: React.Ref<HTMLButtonElement>;
+      disabled?: boolean;
+      onClick?: React.MouseEventHandler<HTMLButtonElement>;
+    }
+    export type ButtonPrimitiveProps = Pick<
+      React.ComponentPropsWithoutRef<"button">,
+      "type"
+    >;
+    ```
+
+- **UI コンポーネントは原則 [shadcn/ui](https://ui.shadcn.com) をベースにカスタマイズして実装してください**
+- shadcn にない場合は [Radix UI](https://www.radix-ui.com) の利用を検討してください
+- **Tailwind CSS**を用いたスタイリングを行ってください
+- プロジェクト固有のユーティリティクラスには `op-` プレフィックスを付与してください
+- ユーティリティ関数 **`cn`** を使用して複数クラス名を結合してください
+- **`cva` (class-variance-authority)** を使用したスタイル管理について
+  - バリエーションを有する場合は変数名を `XXXVariants` とし、`variants` オプションを定義してください
+  - バリエーションを有さない場合は`className`に直接指定もしくは変数名を `XXXClasses` とし、`cva` を使用せずに文字列で管理してください
+- 利用側が柔軟性に拡張できる Props の設計は行わないこと
+  - HTML プリミティブ由来の Props は、`Pick<React.ComponentPropsWithoutRef<"button">, "type" | "disabled" | "onClick">` のように列挙的に許可する
+    （a11y のために必要な ARIA 属性・キーボードイベント・`tabIndex`・必要に応じて`data-testid`等は各コンポーネントで明示列挙して許可する）
+  - 公開 API として `...props` による一括伝播は行わない（内部実装の子要素間での伝播に限り可）
+  - 公開 API として `className` によるスタイルの拡張性は許容しない
+  - **例外**: `internal/` ディレクトリのコンポーネントは柔軟性を重視し、`className` や `...props` の使用を許容します
+- **Storybook**によるドキュメント化・動作確認を行ってください
+- **Storybook でのデモ**では、配列の静的データに限り `index` や固定文字列の `key` を許容します（動的並び替え/挿入が発生する例は除外）
+
+## 推奨事項
+
+- 既存の実装パターンとの一貫性を保つよう心がけてください。
+- 再利用性・拡張性を意識した設計を心がけてください。
+- UI ロジックとビジネスロジックは明確に分離してください。
+- 必要に応じて `hooks` ディレクトリを活用し、ロジックの共通化を図ってください。
+- アクセシビリティ（a11y）を意識した実装を心がけてください。
+- パフォーマンスを考慮し、適切にメモ化を行ってください。
+
+## 参考
+
+- [プロジェクト全体のコーディングガイドライン](mdc:../globals/coding_guidelines.mdc)
+- [プロジェクト構造ガイドライン](mdc:../globals/project_structure.mdc)
