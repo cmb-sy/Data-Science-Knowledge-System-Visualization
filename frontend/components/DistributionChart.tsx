@@ -2,7 +2,7 @@
  * 確率分布グラフコンポーネント
  * RechartsでPDFとCDFを描画
  */
-'use client';
+"use client";
 
 import {
   LineChart,
@@ -13,8 +13,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from 'recharts';
-import type { DistributionData } from '@/types/distribution';
+} from "recharts";
+import type { DistributionData } from "@/types/distribution";
 
 interface DistributionChartProps {
   data: DistributionData;
@@ -35,57 +35,70 @@ export default function DistributionChart({
   }));
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">
-        確率分布グラフ
-      </h3>
-      
+    <div className="border border-gray-200 rounded-lg p-6">
       <ResponsiveContainer width="100%" height={400}>
         <LineChart
           data={chartData}
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke="#e5e7eb"
+            vertical={false}
+          />
           <XAxis
             dataKey="x"
-            label={{ value: 'x', position: 'insideBottomRight', offset: -10 }}
-            stroke="#666"
+            stroke="#9ca3af"
+            style={{ fontSize: "12px" }}
+            tickLine={false}
+            axisLine={{ stroke: "#e5e7eb" }}
           />
           <YAxis
-            label={{ value: 'y', angle: -90, position: 'insideLeft' }}
-            stroke="#666"
+            stroke="#9ca3af"
+            style={{ fontSize: "12px" }}
+            tickLine={false}
+            axisLine={{ stroke: "#e5e7eb" }}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
+              backgroundColor: "white",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              fontSize: "12px",
+              padding: "8px 12px",
             }}
             formatter={(value: number) => value.toFixed(6)}
+            labelStyle={{ color: "#6b7280", marginBottom: "4px" }}
           />
-          <Legend />
-          
+          <Legend
+            wrapperStyle={{
+              paddingTop: "16px",
+              fontSize: "13px",
+            }}
+            iconType="line"
+          />
+
           {showPDF && (
             <Line
               type="monotone"
               dataKey="pdf"
-              stroke="#0ea5e9"
+              stroke="#2563eb"
               strokeWidth={2}
               dot={false}
-              name="確率密度関数 (PDF)"
-              isAnimationActive={true}
+              name="PDF"
+              isAnimationActive={false}
             />
           )}
-          
+
           {showCDF && (
             <Line
               type="monotone"
               dataKey="cdf"
-              stroke="#f59e0b"
+              stroke="#64748b"
               strokeWidth={2}
               dot={false}
-              name="累積分布関数 (CDF)"
-              isAnimationActive={true}
+              name="CDF"
+              isAnimationActive={false}
             />
           )}
         </LineChart>
@@ -93,4 +106,3 @@ export default function DistributionChart({
     </div>
   );
 }
-

@@ -2,15 +2,15 @@
  * パラメータスライダーコンポーネント
  * 分布のパラメータをインタラクティブに調整
  */
-'use client';
+"use client";
 
-import type { DistributionParameter } from '@/types/distribution';
+import type { DistributionParameter } from "@/types/distribution";
 
 interface ParameterSliderProps {
   parameter: DistributionParameter;
   value: number;
   onChange: (value: number) => void;
-  onCommit?: (value: number) => void; // 変更確定時（スライダー終了時）に呼びたい場合
+  onCommit?: () => void;
 }
 
 export default function ParameterSlider({
@@ -22,18 +22,19 @@ export default function ParameterSlider({
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(parseFloat(e.target.value));
   };
-  const handleMouseUp = (e: React.MouseEvent<HTMLInputElement>) => {
-    if (onCommit) onCommit(parseFloat((e.target as HTMLInputElement).value));
+
+  const handleMouseUp = () => {
+    onCommit?.();
   };
-  const handleTouchEnd = (e: React.TouchEvent<HTMLInputElement>) => {
-    if (onCommit)
-      onCommit(parseFloat((e.target as HTMLInputElement).value || "0"));
+
+  const handleTouchEnd = () => {
+    onCommit?.();
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-      <div className="flex justify-between items-center mb-2">
-        <label className="text-sm font-semibold text-gray-700">
+    <div className="space-y-3">
+      <div className="flex justify-between items-center">
+        <label className="text-sm font-medium text-gray-900">
           {parameter.label}
         </label>
         <input
@@ -43,10 +44,10 @@ export default function ParameterSlider({
           step={parameter.step}
           min={parameter.min_value}
           max={parameter.max_value}
-          className="w-20 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
+          className="w-20 px-2.5 py-1 text-sm text-right font-mono border border-gray-300 rounded focus:outline-none focus:border-gray-900 transition-colors"
         />
       </div>
-      
+
       <input
         type="range"
         min={parameter.min_value}
@@ -56,18 +57,13 @@ export default function ParameterSlider({
         onChange={handleChange}
         onMouseUp={handleMouseUp}
         onTouchEnd={handleTouchEnd}
-        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+        className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-gray-900"
       />
-      
-      <div className="flex justify-between text-xs text-gray-500 mt-1">
+
+      <div className="flex justify-between text-xs text-gray-500 font-mono">
         <span>{parameter.min_value}</span>
         <span>{parameter.max_value}</span>
       </div>
-      
-      <p className="text-xs text-gray-600 mt-2">
-        {parameter.description}
-      </p>
     </div>
   );
 }
-

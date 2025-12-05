@@ -42,7 +42,6 @@ export default function DistributionPage({ params }: PageProps) {
         const data = await getDistributionInfo(distType);
         setSelectedInfo(data);
 
-        // デフォルトパラメータを設定
         const defaultParams: Record<string, number> = {};
         data.parameters.forEach((param) => {
           defaultParams[param.name] = param.default_value;
@@ -59,7 +58,7 @@ export default function DistributionPage({ params }: PageProps) {
     fetchDistributionInfo();
   }, [distType]);
 
-  // 分布データの計算（パラメータ変更時に自動実行）
+  // 分布データの計算
   const fetchDistributionData = useCallback(async () => {
     if (!selectedInfo || Object.keys(parameters).length === 0) return;
 
@@ -84,7 +83,7 @@ export default function DistributionPage({ params }: PageProps) {
     }
   }, [distType, parameters, selectedInfo]);
 
-  // パラメータ変更時に即座に再計算（デバウンス20ms - より滑らかに）
+  // パラメータ変更時に即座に再計算
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchDistributionData();
@@ -103,57 +102,82 @@ export default function DistributionPage({ params }: PageProps) {
 
   return (
     <ErrorBoundary>
-      <main className="min-h-screen p-6">
-        <div className="max-w-7xl mx-auto">
-          {/* ヘッダー */}
-          <header className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                  {selectedInfo?.name || "確率分布可視化"}
-                </h1>
-                <p className="text-gray-600">
-                  {selectedInfo?.description ||
-                    "パラメータをリアルタイムで調整して確率分布の変化を観察できます"}
-                </p>
-              </div>
+      <div className="min-h-screen bg-white">
+        {/* ヘッダー */}
+        <header className="border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center gap-4">
               <Link
                 href="/"
-                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors font-medium"
+                className="text-gray-400 hover:text-gray-900 transition-colors"
               >
-                ← 一覧に戻る
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
               </Link>
-            </div>
-          </header>
 
+              <div className="flex-1">
+                <h1 className="text-xl font-semibold text-gray-900">
+                  {selectedInfo?.name || "読み込み中..."}
+                </h1>
+                {selectedInfo?.tags && selectedInfo.tags.length > 0 && (
+                  <div className="flex gap-1.5 mt-1.5">
+                    {selectedInfo.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-7xl mx-auto px-6 py-8">
           {/* エラー表示 */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-900">
+              {error}
             </div>
           )}
 
           {/* メインコンテンツ */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* 左カラム: パラメータ調整 */}
-            <div className="lg:col-span-1 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            {/* サイドバー: パラメータ調整 */}
+            <aside className="lg:col-span-1">
               {selectedInfo && (
-                <>
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-800 px-1">
-                      パラメータ調整
-                    </h3>
-                    {selectedInfo.parameters.map((param) => (
-                      <ParameterSlider
-                        key={param.name}
-                        parameter={param}
-                        value={parameters[param.name] || param.default_value}
-                        onChange={(value) =>
-                          handleParameterChange(param.name, value)
-                        }
-                        onCommit={() => fetchDistributionData()}
-                      />
-                    ))}
+                <div className="space-y-6 sticky top-20">
+                  <div>
+                    <h2 className="text-sm font-semibold text-gray-900 mb-4">
+                      パラメータ
+                    </h2>
+                    <div className="space-y-6">
+                      {selectedInfo.parameters.map((param) => (
+                        <ParameterSlider
+                          key={param.name}
+                          parameter={param}
+                          value={parameters[param.name] || param.default_value}
+                          onChange={(value) =>
+                            handleParameterChange(param.name, value)
+                          }
+                          onCommit={() => fetchDistributionData()}
+                        />
+                      ))}
+                    </div>
                   </div>
 
                   {distributionData && (
@@ -163,39 +187,43 @@ export default function DistributionPage({ params }: PageProps) {
                       stdDev={distributionData.std_dev}
                     />
                   )}
-                </>
+                </div>
               )}
-            </div>
+            </aside>
 
-            {/* 右カラム: グラフと数式 */}
-            <div className="lg:col-span-2 space-y-6">
-              {loading && <LoadingSpinner message="グラフデータを計算中..." />}
+            {/* メインエリア: グラフと数式 */}
+            <div className="lg:col-span-3 space-y-8">
+              {loading ? (
+                <div className="border border-gray-200 rounded-lg p-12">
+                  <LoadingSpinner message="計算中..." />
+                </div>
+              ) : (
+                distributionData && (
+                  <>
+                    <DistributionChart data={distributionData} />
 
-              {!loading && distributionData && (
-                <>
-                  <DistributionChart data={distributionData} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {selectedInfo?.formula_pdf && (
+                        <FormulaDisplay
+                          formula={selectedInfo.formula_pdf}
+                          label="確率密度関数 (PDF)"
+                        />
+                      )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {selectedInfo?.formula_pdf && (
-                      <FormulaDisplay
-                        formula={selectedInfo.formula_pdf}
-                        label="確率密度関数 (PDF)"
-                      />
-                    )}
-
-                    {selectedInfo?.formula_cdf && (
-                      <FormulaDisplay
-                        formula={selectedInfo.formula_cdf}
-                        label="累積分布関数 (CDF)"
-                      />
-                    )}
-                  </div>
-                </>
+                      {selectedInfo?.formula_cdf && (
+                        <FormulaDisplay
+                          formula={selectedInfo.formula_cdf}
+                          label="累積分布関数 (CDF)"
+                        />
+                      )}
+                    </div>
+                  </>
+                )
               )}
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </ErrorBoundary>
   );
 }

@@ -1,30 +1,29 @@
 /**
  * ローディングスピナーコンポーネント
  */
-'use client';
+"use client";
 
 interface LoadingSpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   message?: string;
 }
 
-export default function LoadingSpinner({ 
-  size = 'md', 
-  message = '読み込み中...' 
+export default function LoadingSpinner({
+  size = "md",
+  message,
 }: LoadingSpinnerProps) {
   const sizeClasses = {
-    sm: 'h-6 w-6',
-    md: 'h-12 w-12',
-    lg: 'h-16 w-16',
+    sm: "h-4 w-4 border",
+    md: "h-6 w-6 border-2",
+    lg: "h-8 w-8 border-2",
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-12">
-      <div className={`animate-spin rounded-full border-b-2 border-primary-600 ${sizeClasses[size]}`}></div>
-      {message && (
-        <p className="mt-4 text-gray-600 text-sm">{message}</p>
-      )}
+    <div className="flex flex-col items-center justify-center py-8">
+      <div
+        className={`animate-spin rounded-full border-gray-300 border-t-gray-900 ${sizeClasses[size]}`}
+      ></div>
+      {message && <p className="mt-3 text-gray-600 text-sm">{message}</p>}
     </div>
   );
 }
-

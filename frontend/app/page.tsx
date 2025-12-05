@@ -50,7 +50,6 @@ export default function Home() {
   // カテゴリごとにグループ化
   const groupedDistributions = useMemo(() => {
     const filtered = distributions.filter((dist) => {
-      // タグフィルタリング
       if (selectedTags.length > 0) {
         const hasSelectedTag = selectedTags.some((tag) =>
           dist.tags.includes(tag)
@@ -58,7 +57,6 @@ export default function Home() {
         if (!hasSelectedTag) return false;
       }
 
-      // 検索クエリフィルタリング
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
@@ -92,131 +90,160 @@ export default function Home() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner message="確率分布を読み込み中..." />
+        <LoadingSpinner message="読み込み中..." />
       </div>
     );
   }
 
   return (
     <ErrorBoundary>
-      <main className="min-h-screen p-6 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-7xl mx-auto">
-          {/* ヘッダー */}
-          <header className="mb-12 text-center">
-            <h1 className="text-5xl font-bold text-gray-900 mb-4">
-              数理・統計・機械学習モデル可視化システム
-            </h1>
-          </header>
+      <div className="min-h-screen bg-white">
+        {/* ヘッダー */}
+        <header className="border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-xl font-semibold text-gray-900">
+                  確率分布・機械学習モデル
+                </h1>
+              </div>
 
+              {/* 検索ボックス */}
+              <div className="relative w-80">
+                <input
+                  type="text"
+                  placeholder="検索..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-gray-900 transition-colors"
+                />
+                <svg
+                  className="absolute left-3 top-2.5 h-4 w-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="max-w-7xl mx-auto px-6 py-8">
           {/* エラー表示 */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-700">{error}</p>
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-900">
+              {error}
             </div>
           )}
 
-          {/* 検索とフィルタリング */}
-          <div className="mb-8 space-y-4">
-            {/* 検索ボックス */}
-            <div>
-              <input
-                type="text"
-                placeholder="名前やタグで検索..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* タグフィルター */}
-            {allTags.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                  タグでフィルター:
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {allTags.map((tag) => (
-                    <button
-                      key={tag}
-                      onClick={() => toggleTag(tag)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-                        selectedTags.includes(tag)
-                          ? "bg-primary-600 text-white"
-                          : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* 選択中のタグを表示 */}
-            {selectedTags.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">選択中:</span>
-                {selectedTags.map((tag) => (
-                  <span
+          {/* タグフィルター */}
+          {allTags.length > 0 && (
+            <div className="mb-8 pb-6 border-b border-gray-200">
+              <div className="flex flex-wrap gap-2">
+                {allTags.map((tag) => (
+                  <button
                     key={tag}
-                    className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium flex items-center gap-1"
+                    onClick={() => toggleTag(tag)}
+                    className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                      selectedTags.includes(tag)
+                        ? "bg-gray-900 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
                   >
                     {tag}
-                    <button
-                      onClick={() => toggleTag(tag)}
-                      className="hover:text-primary-900"
-                    >
-                      ×
-                    </button>
-                  </span>
+                  </button>
                 ))}
-                <button
-                  onClick={() => setSelectedTags([])}
-                  className="text-sm text-gray-500 hover:text-gray-700 underline"
-                >
-                  すべてクリア
-                </button>
               </div>
-            )}
-          </div>
+
+              {selectedTags.length > 0 && (
+                <div className="flex items-center gap-2 mt-3">
+                  <span className="text-sm text-gray-600">選択中:</span>
+                  {selectedTags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-900 text-white text-sm rounded-md"
+                    >
+                      {tag}
+                      <button
+                        onClick={() => toggleTag(tag)}
+                        className="hover:opacity-70"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                  <button
+                    onClick={() => setSelectedTags([])}
+                    className="text-sm text-gray-600 hover:text-gray-900 underline"
+                  >
+                    クリア
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* カテゴリごとに分類表示 */}
-          <div className="space-y-8">
+          <div className="space-y-12">
             {Object.entries(groupedDistributions).map(([category, items]) => (
               <section key={category}>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4 pb-2 border-b-2 border-primary-500">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
                   {CATEGORY_LABELS[category as CategoryType]}
                   <span className="ml-2 text-sm font-normal text-gray-500">
-                    ({items.length})
+                    {items.length}
                   </span>
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {items.map((dist) => (
                     <Link
                       key={dist.type}
                       href={`/${dist.type}`}
-                      className="block bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 hover:border-primary-400 transform hover:-translate-y-1"
+                      className="group block border border-gray-200 rounded-lg p-6 hover:border-gray-400 hover:shadow-sm transition-all"
                     >
-                      <div className="p-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
-                          {dist.name}
-                        </h3>
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                          {dist.description}
-                        </p>
-                        {/* タグ表示 */}
-                        {dist.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mb-3">
-                            {dist.tags.map((tag) => (
-                              <span
-                                key={tag}
-                                className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs"
-                              >
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-                        )}
+                      <h3 className="text-base font-semibold text-gray-900 mb-2">
+                        {dist.name}
+                      </h3>
+
+                      <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-2">
+                        {dist.description}
+                      </p>
+
+                      {dist.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mb-3">
+                          {dist.tags.slice(0, 4).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="text-sm text-gray-900 group-hover:translate-x-1 transition-transform inline-flex items-center">
+                        詳しく見る
+                        <svg
+                          className="w-4 h-4 ml-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
                       </div>
                     </Link>
                   ))}
@@ -227,9 +254,9 @@ export default function Home() {
 
           {/* 結果が0件の場合 */}
           {Object.keys(groupedDistributions).length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">
-                条件に一致する分布・モデルが見つかりませんでした。
+            <div className="text-center py-16">
+              <p className="text-gray-600 mb-4">
+                条件に一致する分布・モデルが見つかりませんでした
               </p>
               {(selectedTags.length > 0 || searchQuery) && (
                 <button
@@ -237,7 +264,7 @@ export default function Home() {
                     setSelectedTags([]);
                     setSearchQuery("");
                   }}
-                  className="mt-4 px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
                 >
                   フィルターをクリア
                 </button>
@@ -245,7 +272,7 @@ export default function Home() {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </ErrorBoundary>
   );
 }
