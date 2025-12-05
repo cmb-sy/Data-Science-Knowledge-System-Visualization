@@ -4,6 +4,23 @@
 
 export type DistributionType = "uniform";
 
+export type CategoryType =
+  | "continuous" // 連続型確率分布
+  | "discrete" // 離散確率分布
+  | "multivariate" // 多変量分布
+  | "ml_regression" // 機械学習: 回帰
+  | "ml_classification" // 機械学習: 分類
+  | "ml_clustering"; // 機械学習: クラスタリング
+
+export const CATEGORY_LABELS: Record<CategoryType, string> = {
+  continuous: "連続型確率分布",
+  discrete: "離散確率分布",
+  multivariate: "多変量分布",
+  ml_regression: "回帰モデル",
+  ml_classification: "分類モデル",
+  ml_clustering: "クラスタリング",
+};
+
 export interface DistributionParameter {
   name: string;
   label: string;
@@ -18,6 +35,8 @@ export interface DistributionInfo {
   type: DistributionType;
   name: string;
   description: string;
+  category: CategoryType;
+  tags: string[];
   formula_pdf: string;
   formula_cdf?: string;
   parameters: DistributionParameter[];
@@ -37,4 +56,3 @@ export interface CalculateRequest {
   parameters: Record<string, number>;
   num_points?: number;
 }
-

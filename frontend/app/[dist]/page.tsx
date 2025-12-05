@@ -194,16 +194,6 @@ export default function DistributionPage({ params }: PageProps) {
               )}
             </div>
           </div>
-
-          {/* フッター */}
-          <footer className="mt-12 pt-6 border-t border-gray-200 text-center">
-            <Link
-              href="/"
-              className="inline-flex items-center text-primary-600 hover:text-primary-700 font-medium"
-            >
-              ← 確率分布一覧に戻る
-            </Link>
-          </footer>
         </div>
       </main>
     </ErrorBoundary>
