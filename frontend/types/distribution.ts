@@ -2,7 +2,7 @@
  * 確率分布関連の型定義
  */
 
-export type DistributionType = "uniform";
+export type DistributionType = "uniform" | "exponential";
 
 export type CategoryType =
   | "continuous" // 連続型確率分布

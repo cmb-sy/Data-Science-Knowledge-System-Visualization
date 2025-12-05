@@ -102,6 +102,95 @@ export default function DistributionPage({ params }: PageProps) {
 
   return (
     <ErrorBoundary>
+      {/* エラー表示 - 右上固定ポップアップ */}
+      {error && (
+        <div
+          style={{
+            position: "fixed",
+            top: "1rem",
+            right: "1rem",
+            zIndex: 10000,
+            maxWidth: "28rem",
+            animation: "slide-in-right 0.3s ease-out forwards",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              border: "1px solid #fecaca",
+              borderRadius: "0.5rem",
+              boxShadow:
+                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+              padding: "1rem",
+              display: "flex",
+              gap: "0.75rem",
+              alignItems: "start",
+            }}
+          >
+            <div style={{ flexShrink: 0, marginTop: "0.125rem" }}>
+              <svg
+                style={{
+                  width: "1.25rem",
+                  height: "1.25rem",
+                  color: "#dc2626",
+                }}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p
+                style={{
+                  fontSize: "0.875rem",
+                  color: "#7f1d1d",
+                  fontWeight: 500,
+                  wordBreak: "break-word",
+                }}
+              >
+                {error}
+              </p>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              style={{
+                color: "#f87171",
+                flexShrink: 0,
+                marginTop: "0.125rem",
+                cursor: "pointer",
+                background: "none",
+                border: "none",
+                padding: 0,
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#dc2626")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "#f87171")}
+              aria-label="閉じる"
+            >
+              <svg
+                style={{ width: "1.25rem", height: "1.25rem" }}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="min-h-screen bg-white">
         {/* ヘッダー */}
         <header className="border-b border-gray-200">
@@ -148,13 +237,6 @@ export default function DistributionPage({ params }: PageProps) {
         </header>
 
         <div className="max-w-7xl mx-auto px-6 py-8">
-          {/* エラー表示 */}
-          {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-900">
-              {error}
-            </div>
-          )}
-
           {/* メインコンテンツ */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* サイドバー: パラメータ調整 */}
