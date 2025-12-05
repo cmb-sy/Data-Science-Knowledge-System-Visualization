@@ -1,9 +1,4 @@
-"""
-一様分布の実装
-"""
-
 import numpy as np
-from scipy import stats
 
 from .base import (
     DistributionType,
@@ -15,11 +10,9 @@ from .base import (
 
 
 class UniformDistribution:
-    """一様分布の実装"""
 
     @staticmethod
     def get_info() -> DistributionInfo:
-        """一様分布の情報を取得"""
         return DistributionInfo(
             type=DistributionType.UNIFORM,
             name="一様分布",
@@ -52,35 +45,19 @@ class UniformDistribution:
 
     @staticmethod
     def calculate(a: float, b: float, num_points: int = 1000) -> DistributionData:
-        """
-        一様分布のデータを計算
-
-        Args:
-            a: 下限
-            b: 上限
-            num_points: グラフのデータポイント数
-
-        Returns:
-            DistributionData: グラフ描画用のデータ
-        """
         if a >= b:
-            raise ValueError("下限 (a) は上限 (b) より小さくなければなりません")
+            raise ValueError("aはbより小さくなければなりません")
 
-        # scipy.statsを使用して一様分布を生成
-        dist = stats.uniform(loc=a, scale=b - a)
-
-        # x軸の値を生成（分布の範囲より少し広めに）
         margin = (b - a) * 0.2
         x = np.linspace(a - margin, b + margin, num_points)
 
-        # PDFとCDFを計算
-        pdf = dist.pdf(x)
-        cdf = dist.cdf(x)
+        pdf = np.where((x >= a) & (x <= b), 1.0 / (b - a), 0.0)
 
-        # 統計量を計算
-        mean = dist.mean()
-        variance = dist.var()
-        std_dev = dist.std()
+        cdf = np.clip((x - a) / (b - a), 0.0, 1.0)
+
+        mean = (a + b) / 2.0
+        variance = ((b - a) ** 2) / 12.0
+        std_dev = np.sqrt(variance)
 
         return DistributionData(
             x_values=x.tolist(),

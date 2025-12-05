@@ -37,32 +37,17 @@ class ExponentialDistribution:
 
     @staticmethod
     def calculate(lambda_: float, num_points: int = 1000) -> DistributionData:
-        """
-        指数分布のデータを計算
-
-        Args:
-            lambda_: レートパラメータ（λ）
-            num_points: グラフのデータポイント数
-
-        Returns:
-            DistributionData: グラフ描画用のデータ
-        """
         if lambda_ <= 0:
             raise ValueError("λは正の値でなければなりません")
 
-        # 統計量を計算（理論値）
         mean = 1.0 / lambda_
         variance = 1.0 / (lambda_**2)
         std_dev = 1.0 / lambda_
 
-        # x軸の値を生成（平均の5倍程度まで表示）
         x_max = mean * 5
         x = np.linspace(0, x_max, num_points)
 
-        # PDF を数式から直接計算: f(x) = λ * e^(-λx) for x >= 0
         pdf = lambda_ * np.exp(-lambda_ * x)
-
-        # CDF を数式から直接計算: F(x) = 1 - e^(-λx) for x >= 0
         cdf = 1 - np.exp(-lambda_ * x)
 
         return DistributionData(
